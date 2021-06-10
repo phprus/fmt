@@ -298,7 +298,7 @@ inline auto do_write(const std::tm& time, const std::locale& loc, char format,
   auto str = os.str();
   if (!detail::is_utf8() || loc == std::locale::classic()) return str;
   // char16_t and char32_t codecvts are broken in MSVC (linkage errors).
-  using code_unit = conditional_t<FMT_MSC_VER != 0, wchar_t, char16_t>;
+  using code_unit = conditional_t<FMT_MSC_VER != 0, wchar_t, char32_t>;
   auto& f = std::use_facet<std::codecvt<code_unit, char, std::mbstate_t>>(loc);
   auto mb = std::mbstate_t();
   const char* from_next = nullptr;
@@ -316,6 +316,15 @@ inline auto do_write(const std::tm& time, const std::locale& loc, char format,
       str.push_back(static_cast<char>(c));
     } else if (c < 0x800) {
       str.push_back(static_cast<char>(0xc0 | (c >> 6)));
+      str.push_back(static_cast<char>(0x80 | (c & 0x3f)));
+    } else if ((c >= 0x800 && c <= 0xd7ff) || (c >= 0xe000 && c <= 0xffff)) {
+      str.push_back(static_cast<char>(0xe0 | (c >> 12)));
+      str.push_back(static_cast<char>(0x80 | ((c & 0xfff) >> 6)));
+      str.push_back(static_cast<char>(0x80 | (c & 0x3f)));
+    } else if (c >= 0x10000 && c <= 0x10ffff) {
+      str.push_back(static_cast<char>(0xf0 | (c >> 18)));
+      str.push_back(static_cast<char>(0x80 | ((c & 0x3ffff) >> 12)));
+      str.push_back(static_cast<char>(0x80 | ((c & 0xfff) >> 6)));
       str.push_back(static_cast<char>(0x80 | (c & 0x3f)));
     } else {
       FMT_THROW(format_error("failed to format time"));
