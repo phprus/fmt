@@ -298,8 +298,16 @@ inline auto do_write(const std::tm& time, const std::locale& loc, char format,
   if (end.failed()) FMT_THROW(format_error("failed to format time"));
   auto str = os.str();
   if (!detail::is_utf8() || loc == std::locale::classic()) return str;
-  // char16_t and char32_t codecvts are broken in MSVC (linkage errors).
-  using code_unit = conditional_t<FMT_MSC_VER != 0, wchar_t, char32_t>;
+    // char16_t and char32_t codecvts are broken in MSVC (linkage errors) and
+    // gcc-4.
+#if FMT_MSC_VER != 0 || \
+    (defined(__GLIBCXX__) && !defined(_GLIBCXX_USE_DUAL_ABI))
+  // macro _GLIBCXX_USE_DUAL_ABI is always defined in libstdc++ from gcc-5 and
+  // newer
+  using code_unit = wchar_t;
+#else
+  using code_unit = char32_t;
+#endif
   auto& f = std::use_facet<std::codecvt<code_unit, char, std::mbstate_t>>(loc);
   auto mb = std::mbstate_t();
   const char* from_next = nullptr;
