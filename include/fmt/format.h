@@ -825,27 +825,6 @@ class FMT_API format_error : public std::runtime_error {
   ~format_error() noexcept override FMT_MSC_DEFAULT;
 };
 
-/**
-  \rst
-  Constructs a `~fmt::format_arg_store` object that contains references
-  to arguments and can be implicitly converted to `~fmt::format_args`.
-  If ``fmt`` is a compile-time string then `make_args_checked` checks
-  its validity at compile time.
-  \endrst
- */
-template <typename... Args, typename S, typename Char = char_t<S>>
-FMT_INLINE auto make_args_checked(const S& fmt,
-                                  const remove_reference_t<Args>&... args)
-    -> format_arg_store<buffer_context<Char>, remove_reference_t<Args>...> {
-  static_assert(
-      detail::count<(
-              std::is_base_of<detail::view, remove_reference_t<Args>>::value &&
-              std::is_reference<Args>::value)...>() == 0,
-      "passing views as lvalues is disallowed");
-  detail::check_format_string<Args...>(fmt);
-  return {args...};
-}
-
 // compile-time support
 namespace detail_exported {
 #if FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
