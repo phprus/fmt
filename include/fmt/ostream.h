@@ -66,6 +66,7 @@ void write_buffer(std::basic_ostream<Char>& os, buffer<Char>& buf) {
   } while (size != 0);
 }
 
+// DEPRECATED!
 template <typename Char, typename T>
 void format_value(buffer<Char>& buf, const T& value,
                   locale_ref loc = locale_ref()) {
@@ -78,18 +79,84 @@ void format_value(buffer<Char>& buf, const T& value,
   output.exceptions(std::ios_base::failbit | std::ios_base::badbit);
   buf.try_resize(buf.size());
 }
+
+template <typename Char, typename OutputIt>
+class formatbuf_out : public std::basic_streambuf<Char> {
+ private:
+  using int_type = typename std::basic_streambuf<Char>::int_type;
+  using traits_type = typename std::basic_streambuf<Char>::traits_type;
+
+  OutputIt& out_;
+
+ public:
+  explicit formatbuf_out(OutputIt& out) : out_(out) {}
+
+ protected:
+  // The put area is always empty. This makes the implementation simpler and has
+  // the advantage that the streambuf and the buffer are always in sync and
+  // sputc never writes into uninitialized memory. A disadvantage is that each
+  // call to sputc always results in a (virtual) call to overflow. There is no
+  // disadvantage here for sputn since this always results in a call to xsputn.
+
+  auto overflow(int_type ch) -> int_type override {
+    if (!traits_type::eq_int_type(ch, traits_type::eof()))
+      *out_++ = static_cast<Char>(ch);
+    return ch;
+  }
+
+  auto xsputn(const Char* s, std::streamsize count)
+      -> std::streamsize override {
+    out_ = copy_str<Char>(s, s + count, out_);
+    return count;
+  }
+};
+
 }  // namespace detail
 
 // Formats an object of type T that has an overloaded ostream operator<<.
 template <typename Char>
 struct basic_ostream_formatter : formatter<basic_string_view<Char>, Char> {
+ private:
+  using base_t = formatter<basic_string_view<Char>, Char>;
+
+  bool default_format_{true};
+
+  template <typename FormatBuf, typename Opt, typename T>
+  void do_format(Opt&& opt, const T& value,
+                 detail::locale_ref loc = detail::locale_ref()) const {
+    FormatBuf format_buf(opt);
+    std::basic_ostream<Char> output(&format_buf);
+#if !defined(FMT_STATIC_THOUSANDS_SEPARATOR)
+    if (loc) output.imbue(loc.get<std::locale>());
+#endif
+    output << value;
+    output.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+  }
+
+ public:
+  template <typename ParseContext>
+  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+    auto begin = ctx.begin(), end = ctx.end();
+    if (begin == end || *begin == '}') return begin;
+    default_format_ = false;
+    return base_t::parse(ctx);
+  }
+
   template <typename T, typename OutputIt>
   auto format(const T& value, basic_format_context<OutputIt, Char>& ctx) const
       -> OutputIt {
-    auto buffer = basic_memory_buffer<Char>();
-    format_value(buffer, value, ctx.locale());
-    return formatter<basic_string_view<Char>, Char>::format(
-        {buffer.data(), buffer.size()}, ctx);
+    if (default_format_) {
+      OutputIt out = ctx.out();
+      do_format<detail::formatbuf_out<Char, OutputIt>>(out, value,
+                                                       ctx.locale());
+      return out;
+    } else {
+      basic_memory_buffer<Char> buffer;
+      do_format<detail::formatbuf<std::basic_streambuf<Char>>>(buffer, value,
+                                                               ctx.locale());
+      buffer.try_resize(buffer.size());
+      return base_t::format({buffer.data(), buffer.size()}, ctx);
+    }
   }
 };
 
