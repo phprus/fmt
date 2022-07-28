@@ -16,9 +16,9 @@ jobs:
         os: [windows-2019]
         platform: [Win32, x64]
         toolset: [v140, v141, v142]
-        build_type: [Debug, Release]
         standard: [14, 17, 20]
         shared: ["", -DBUILD_SHARED_LIBS=ON]
+        build_type: [Debug, Release]
         exclude:
           - { toolset: v140, standard: 17 }
           - { toolset: v140, standard: 20 }
@@ -49,9 +49,9 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} ${{matrix.shared}} \
-              -A ${{matrix.platform}} -T ${{matrix.toolset}} \
+        cmake -A ${{matrix.platform}} -T ${{matrix.toolset}} \
               -DCMAKE_CXX_STANDARD=${{matrix.standard}} \
+              ${{matrix.shared}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
               $GITHUB_WORKSPACE
 
     - name: Build
