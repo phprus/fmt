@@ -20,7 +20,9 @@ jobs:
         standard: [14, 17, 20]
         shared: ["", -DBUILD_SHARED_LIBS=ON]
         exclude:
+          - { toolset: v140, standard: 17 }
           - { toolset: v140, standard: 20 }
+          - { toolset: v141, standard: 20 }
           - { platform: Win32, toolset: v140 }
           - { platform: Win32, toolset: v141 }
           - { platform: Win32, standard: 14 }
