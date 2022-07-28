@@ -19,14 +19,21 @@ jobs:
         build_type: [Debug, Release]
         standard: [14, 17, 20]
         shared: ["", -DBUILD_SHARED_LIBS=ON]
+        exclude:
+          - { toolset: v140, standard: 20 }
+          - { platform: Win32, toolset: v140 }
+          - { platform: Win32, toolset: v141 }
+          - { platform: Win32, standard: 14 }
+          - { platform: Win32, standard: 20 }
+          - { platform: x64, toolset: v140, shared: -DBUILD_SHARED_LIBS=ON }
+          - { platform: x64, toolset: v141, shared: -DBUILD_SHARED_LIBS=ON }
+          - { platform: x64, standard: 14, shared: -DBUILD_SHARED_LIBS=ON }
+          - { platform: x64, standard: 20, shared: -DBUILD_SHARED_LIBS=ON }
         include:
           - os: windows-2022
             platform: x64
             toolset: v143
             build_type: Debug
-            standard: 20
-        exclude:
-          - toolset: v140
             standard: 20
 
     steps:
