@@ -22,7 +22,9 @@ jobs:
         exclude:
           - { toolset: v140, standard: 17 }
           - { toolset: v140, standard: 20 }
+          - { toolset: v141, standard: 14 }
           - { toolset: v141, standard: 20 }
+          - { toolset: v142, standard: 14 }
           - { platform: Win32, toolset: v140 }
           - { platform: Win32, toolset: v141 }
           - { platform: Win32, standard: 14 }
