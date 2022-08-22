@@ -34,7 +34,7 @@
 
 #ifndef FMT_GCC_PRAGMA
 // Workaround _Pragma bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59884.
-#  if FMT_GCC_VERSION >= 504
+#  if FMT_GCC_VERSION >= 504 && !defined(__LCC__)
 #    define FMT_GCC_PRAGMA(arg) _Pragma(arg)
 #  else
 #    define FMT_GCC_PRAGMA(arg)
