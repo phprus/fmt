@@ -24,16 +24,83 @@ jobs:
             install: sudo apt install g++-8
             os: ubuntu-18.04
           - cxx: g++-8
+            build_type: Release
+            std: 14
+            install: sudo apt install g++-8
+            os: ubuntu-18.04
+          - cxx: g++-8
             build_type: Debug
             std: 17
             install: sudo apt install g++-8
+            os: ubuntu-18.04
+          - cxx: g++-8
+            build_type: Release
+            std: 17
+            install: sudo apt install g++-8
+            os: ubuntu-18.04
+          - cxx: g++-8
+            build_type: Debug
+            std: 20
+            install: sudo apt install g++-8
+            os: ubuntu-18.04
+          - cxx: g++-8
+            build_type: Release
+            std: 20
+            install: sudo apt install g++-8
+            os: ubuntu-18.04
+          - cxx: g++-9
+            build_type: Debug
+            std: 14
+            install: sudo apt install g++-9
+            os: ubuntu-18.04
+          - cxx: g++-9
+            build_type: Release
+            std: 14
+            install: sudo apt install g++-9
+            os: ubuntu-18.04
+          - cxx: g++-9
+            build_type: Debug
+            std: 17
+            install: sudo apt install g++-9
+            os: ubuntu-18.04
+          - cxx: g++-9
+            build_type: Release
+            std: 17
+            install: sudo apt install g++-9
+            os: ubuntu-18.04
+          - cxx: g++-9
+            build_type: Debug
+            std: 20
+            install: sudo apt install g++-9
+            os: ubuntu-18.04
+          - cxx: g++-9
+            build_type: Release
+            std: 20
+            install: sudo apt install g++-9
             os: ubuntu-18.04
           - cxx: g++-10
             build_type: Debug
             std: 17
             os: ubuntu-18.04
+          - cxx: g++-10
+            build_type: Release
+            std: 17
+            os: ubuntu-18.04
+          - cxx: g++-10
+            build_type: Debug
+            std: 20
+            os: ubuntu-18.04
+          - cxx: g++-10
+            build_type: Release
+            std: 20
+            os: ubuntu-18.04
           - cxx: g++-11
             build_type: Debug
+            std: 20
+            os: ubuntu-20.04
+            install: sudo apt install g++-11
+          - cxx: g++-11
+            build_type: Release
             std: 20
             os: ubuntu-20.04
             install: sudo apt install g++-11
