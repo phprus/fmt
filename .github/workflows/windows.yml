@@ -39,6 +39,11 @@ jobs:
             toolset: v143
             build_type: Debug
             standard: 20
+          - os: windows-2022
+            platform: x64
+            toolset: v143
+            build_type: Debug
+            standard: 23
 
     steps:
     - uses: actions/checkout@v3
