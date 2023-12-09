@@ -54,6 +54,16 @@ jobs:
             std: 20
             cxxflags: -stdlib=libc++
             install: sudo apt install libc++-11-dev libc++abi-11-dev
+          - cxx: clang++-17
+            build_type: Release
+            std: 20
+            cxxflags: -stdlib=libc++
+            install: sudo apt install clang-17 lld-17 libc++-17-dev libc++abi-17-dev
+          - cxx: clang++-17
+            build_type: Debug
+            std: 20
+            cxxflags: -stdlib=libc++
+            install: sudo apt install clang-17 lld-17 libc++-17-dev libc++abi-17-dev
           - shared: -DBUILD_SHARED_LIBS=ON
 
     steps:
@@ -71,6 +81,12 @@ jobs:
         # sudo apt-add-repository 'deb http://azure.archive.ubuntu.com/ubuntu/ bionic-updates main'
         # sudo apt-add-repository 'deb http://azure.archive.ubuntu.com/ubuntu/ bionic-updates universe'
       if: ${{ matrix.cxx == 'g++-4.8' }}
+
+    - name: Add repositories for upstream clang
+      run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        sudo apt-add-repository 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-17 main'
+      if: ${{ matrix.cxx == 'clang++-17' }}
 
     - name: Add ubuntu mirrors
       run: |
