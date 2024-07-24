@@ -494,7 +494,8 @@ struct is_back_insert_iterator<
 
 // Extracts a reference to the container from *insert_iterator.
 template <typename OutputIt>
-inline auto get_container(OutputIt it) -> typename OutputIt::container_type& {
+FMT_CONSTEXPR20 inline auto get_container(OutputIt it) ->
+    typename OutputIt::container_type& {
   struct accessor : OutputIt {
     accessor(OutputIt base) : OutputIt(base) {}
     using OutputIt::container;
@@ -924,7 +925,8 @@ template <typename T> class buffer {
   }
 
   /// Appends data to the end of the buffer.
-  template <typename U> void append(const U* begin, const U* end) {
+  template <typename U>
+  FMT_CONSTEXPR void append(const U* begin, const U* end) {
     while (begin != end) {
       auto count = to_unsigned(end - begin);
       try_reserve(size_ + count);
@@ -1105,7 +1107,7 @@ template <typename T = char> class counting_buffer : public buffer<T> {
  public:
   FMT_CONSTEXPR counting_buffer() : buffer<T>(grow, data_, 0, buffer_size) {}
 
-  auto count() -> size_t { return count_ + this->size(); }
+  constexpr auto count() const -> size_t { return count_ + this->size(); }
 };
 }  // namespace detail
 
@@ -1155,7 +1157,8 @@ template <typename T> class basic_appender {
  private:
   detail::buffer<T>* buffer_;
 
-  friend auto get_container(basic_appender app) -> detail::buffer<T>& {
+  friend FMT_CONSTEXPR20 auto get_container(basic_appender app)
+      -> detail::buffer<T>& {
     return *app.buffer_;
   }
 
@@ -1170,13 +1173,13 @@ template <typename T> class basic_appender {
 
   FMT_CONSTEXPR basic_appender(detail::buffer<T>& buf) : buffer_(&buf) {}
 
-  auto operator=(T c) -> basic_appender& {
+  FMT_CONSTEXPR auto operator=(T c) -> basic_appender& {
     buffer_->push_back(c);
     return *this;
   }
-  auto operator*() -> basic_appender& { return *this; }
-  auto operator++() -> basic_appender& { return *this; }
-  auto operator++(int) -> basic_appender { return *this; }
+  FMT_CONSTEXPR auto operator*() -> basic_appender& { return *this; }
+  FMT_CONSTEXPR auto operator++() -> basic_appender& { return *this; }
+  FMT_CONSTEXPR auto operator++(int) -> basic_appender { return *this; }
 };
 
 using appender = basic_appender<char>;
@@ -1188,7 +1191,8 @@ struct is_back_insert_iterator<basic_appender<T>> : std::true_type {};
 // An optimized version of std::copy with the output value type (T).
 template <typename T, typename InputIt, typename OutputIt,
           FMT_ENABLE_IF(is_back_insert_iterator<OutputIt>::value)>
-auto copy(InputIt begin, InputIt end, OutputIt out) -> OutputIt {
+FMT_CONSTEXPR20 auto copy(InputIt begin, InputIt end, OutputIt out)
+    -> OutputIt {
   get_container(out).append(begin, end);
   return out;
 }
@@ -2898,7 +2902,9 @@ template <typename Char, typename... Args> class basic_format_string {
   }
   basic_format_string(runtime_format_string<Char> fmt) : str_(fmt.str) {}
 
-  FMT_ALWAYS_INLINE operator basic_string_view<Char>() const { return str_; }
+  FMT_ALWAYS_INLINE constexpr operator basic_string_view<Char>() const {
+    return str_;
+  }
   auto get() const -> basic_string_view<Char> { return str_; }
 };
 

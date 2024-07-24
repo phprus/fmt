@@ -522,7 +522,7 @@ template <typename OutputIt,
 #if FMT_CLANG_VERSION >= 307 && !FMT_ICC_VERSION
 __attribute__((no_sanitize("undefined")))
 #endif
-inline auto
+FMT_CONSTEXPR20 inline auto
 reserve(OutputIt it, size_t n) -> typename OutputIt::value_type* {
   auto& c = get_container(it);
   size_t size = c.size();
@@ -531,7 +531,8 @@ reserve(OutputIt it, size_t n) -> typename OutputIt::value_type* {
 }
 
 template <typename T>
-inline auto reserve(basic_appender<T> it, size_t n) -> basic_appender<T> {
+FMT_CONSTEXPR20 inline auto reserve(basic_appender<T> it, size_t n)
+    -> basic_appender<T> {
   buffer<T>& buf = get_container(it);
   buf.try_reserve(buf.size() + n);
   return it;
@@ -550,7 +551,8 @@ template <typename T, typename OutputIt>
 constexpr auto to_pointer(OutputIt, size_t) -> T* {
   return nullptr;
 }
-template <typename T> auto to_pointer(basic_appender<T> it, size_t n) -> T* {
+template <typename T>
+FMT_CONSTEXPR20 auto to_pointer(basic_appender<T> it, size_t n) -> T* {
   buffer<T>& buf = get_container(it);
   auto size = buf.size();
   buf.try_reserve(size + n);
