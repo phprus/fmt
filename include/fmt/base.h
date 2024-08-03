@@ -926,12 +926,7 @@ template <typename T> class buffer {
 
   /// Appends data to the end of the buffer.
   template <typename U>
-// Workaround for Visual Studio 2019 to fix error C2893: Failed to specialize
-// function template 'void fmt::v11::detail::buffer<T>::append(const U *,const
-// U *)'
-#ifndef FMT_DETAIL_EXPLICIT_INSTANTIATIONS
   FMT_CONSTEXPR20
-#endif
       void
       append(const U* begin, const U* end) {
     while (begin != end) {
