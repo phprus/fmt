@@ -56,6 +56,11 @@ TEST(color_test, format) {
   EXPECT_EQ(fmt::format("{}", fmt::styled("bar", fg(fmt::color::blue) |
                                                      fmt::emphasis::underline)),
             "\x1b[4m\x1b[38;2;000;000;255mbar\x1b[0m");
+
+  std::ostringstream Stream;
+  std::string Line = "";
+  Stream << fmt::format( "{}", fmt::styled( Line, fmt::fg( fmt::terminal_color::blue ) ) ) << "\n";
+  EXPECT_EQ(Stream.str(), "\x1B[34m\x1B[0m\n");
 }
 
 TEST(color_test, format_to) {
