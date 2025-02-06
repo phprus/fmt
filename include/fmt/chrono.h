@@ -22,7 +22,10 @@
 
 #include "format.h"
 
-namespace fmt_detail {
+FMT_BEGIN_NAMESPACE
+
+namespace detail {
+namespace fmt_chrono {
 struct time_zone {
   template <typename Duration, typename T>
   auto to_sys(T)
@@ -35,9 +38,8 @@ template <typename... T> inline auto current_zone(T...) -> time_zone* {
 }
 
 template <typename... T> inline void _tzset(T...) {}
-}  // namespace fmt_detail
-
-FMT_BEGIN_NAMESPACE
+}  // namespace fmt_chrono
+}  // namespace detail
 
 // Enable safe chrono durations, unless explicitly disabled.
 #ifndef FMT_SAFE_DURATION_CAST
@@ -523,8 +525,8 @@ auto to_time_t(sys_time<Duration> time_point) -> std::time_t {
 // providing current_zone(): https://github.com/fmtlib/fmt/issues/4160.
 template <typename T> FMT_CONSTEXPR auto has_current_zone() -> bool {
   using namespace std::chrono;
-  using namespace fmt_detail;
-  return !std::is_same<decltype(current_zone()), fmt_detail::time_zone*>::value;
+  using namespace fmt_chrono;
+  return !std::is_same<decltype(current_zone()), fmt_chrono::time_zone*>::value;
 }
 }  // namespace detail
 
@@ -576,7 +578,7 @@ template <typename Duration,
           FMT_ENABLE_IF(detail::has_current_zone<Duration>())>
 inline auto localtime(std::chrono::local_time<Duration> time) -> std::tm {
   using namespace std::chrono;
-  using namespace fmt_detail;
+  using namespace detail::fmt_chrono;
   return localtime(detail::to_time_t(current_zone()->to_sys<Duration>(time)));
 }
 #endif
@@ -993,7 +995,7 @@ struct has_member_data_tm_zone<T, void_t<decltype(T::tm_zone)>>
 
 inline void tzset_once() {
   static bool init = []() {
-    using namespace fmt_detail;
+    using namespace fmt_chrono;
     _tzset();
     return false;
   }();
