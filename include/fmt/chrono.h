@@ -523,8 +523,8 @@ auto to_time_t(sys_time<Duration> time_point) -> std::time_t {
 // providing current_zone(): https://github.com/fmtlib/fmt/issues/4160.
 template <typename T> FMT_CONSTEXPR auto has_current_zone() -> bool {
   using namespace std::chrono;
-  using namespace fmt_detail;
-  return !std::is_same<decltype(current_zone()), fmt_detail::time_zone*>::value;
+  using namespace fmt::fmt_detail;
+  return !std::is_same<decltype(current_zone()), fmt::fmt_detail::time_zone*>::value;
 }
 }  // namespace detail
 
@@ -576,7 +576,7 @@ template <typename Duration,
           FMT_ENABLE_IF(detail::has_current_zone<Duration>())>
 inline auto localtime(std::chrono::local_time<Duration> time) -> std::tm {
   using namespace std::chrono;
-  using namespace fmt_detail;
+  using namespace fmt::fmt_detail;
   return localtime(detail::to_time_t(current_zone()->to_sys<Duration>(time)));
 }
 #endif
@@ -993,7 +993,7 @@ struct has_member_data_tm_zone<T, void_t<decltype(T::tm_zone)>>
 
 inline void tzset_once() {
   static bool init = []() {
-    using namespace fmt_detail;
+    using namespace fmt::fmt_detail;
     _tzset();
     return false;
   }();
