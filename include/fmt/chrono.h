@@ -22,6 +22,8 @@
 
 #include "format.h"
 
+FMT_BEGIN_NAMESPACE
+
 namespace fmt_detail {
 struct time_zone {
   template <typename Duration, typename T>
@@ -36,8 +38,6 @@ template <typename... T> inline auto current_zone(T...) -> time_zone* {
 
 template <typename... T> inline void _tzset(T...) {}
 }  // namespace fmt_detail
-
-FMT_BEGIN_NAMESPACE
 
 // Enable safe chrono durations, unless explicitly disabled.
 #ifndef FMT_SAFE_DURATION_CAST
